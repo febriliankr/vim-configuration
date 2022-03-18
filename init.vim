@@ -132,11 +132,6 @@ imap <S-Down> <Esc>v<Down>
 imap <S-Left> <Esc>v<Left>
 imap <S-Right> <Esc>v<Right>
 
-vmap <C-c> y<Esc>i
-vmap <C-x> d<Esc>i
-map <C-v> pi
-imap <C-v> <Esc>pi
-
 set cindent
 
 " sync open file with NERDTree
