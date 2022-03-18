@@ -2,13 +2,13 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug 'lambdalisue/fern-git-status.vim'
 Plug 'lambdalisue/fern.vim'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
 Plug 'mattn/emmet-vim'
-Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
@@ -36,6 +36,11 @@ colorscheme github_dark
 
 let g:cursorhold_updatetime = 100
 
+" Fern Configuration
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * ++nested Fern -drawer %:h | if argc() > 0 || exists("s:std_in") | wincmd p | endif
+noremap <A-f> :Fern -drawer %:h -toggle<CR>
+
 " VSCode-like Configuration
 " -- ALT Up and Down (j and k) to swap lines
 nnoremap <A-Down> :m .+1<CR>==
@@ -52,11 +57,7 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 " -- 
-" this is not exactly vscode-like but I like to autosave
-let g:auto_save = 1  " enable AutoSave on Vim startup
-" I'm just checking if the autosave is working properly
-"
-"
+
 " End of VSCode-like Configuration 
 
 inoremap jk <ESC>
@@ -75,37 +76,11 @@ set encoding=UTF-8
 set history=5000
 set clipboard=unnamedplus
 
-" NERDTree Configuration
-autocmd VimEnter * cd %:p:h
-nmap <A-n> :NERDTreeToggle<CR>
 vmap ++ <plug>NERDCommenterToggle
 nmap ++ <plug>NERDCommenterToggle
 
-let g:NERDTreeWinPos = "right"
-
 set autochdir
-
-" open NERDTree automatically
-autocmd StdinReadPre * let s:std_in=1
-autocmd! VimEnter * NERDTree | wincmd w
-
-let g:NERDTreeGitStatusWithFlags = 1
-"let g:WebDevIconsUnicodeDecorateFolderNodes = 1
-"let g:NERDTreeGitStatusNodeColorization = 1
-"let g:NERDTreeColorMapCustom = {
-    "\ "Staged"    : "#0ee375",  
-    "\ "Modified"  : "#d9bf91",  
-    "\ "Renamed"   : "#51C9FC",  
-    "\ "Untracked" : "#FCE77C",  
-    "\ "Unmerged"  : "#FC51E6",  
-    "\ "Dirty"     : "#FFBD61",  
-    "\ "Clean"     : "#87939A",   
-    "\ "Ignored"   : "#808080"   
-    "\ }                         
-
-
-let g:NERDTreeIgnore = ['^node_modules$']
-
+"
 " vim-prettier
 "let g:prettier#quickfix_enabled = 0
 "let g:prettier#quickfix_auto_focus = 0
@@ -138,39 +113,6 @@ imap <S-Left> <Esc>v<Left>
 imap <S-Right> <Esc>v<Right>
 
 set cindent
-
-" sync open file with NERDTree
-" " Check if NERDTree is open or active
-function! IsNERDTreeOpen()        
-  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
-endfunction
-
-" Call NERDTreeFind if NERDTree is active, current window contains a modifiable
-" file, and we're not in vimdiff
-function! SyncTree()
-  if &modifiable && IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
-    NERDTreeFind
-    wincmd p
-  endif
-endfunction
-
-" Close NERDTree if it is the only file
-function! s:CloseIfOnlyControlWinLeft()
-  if winnr("$") != 1
-    return
-  endif
-  if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
-        \ || &buftype == 'quickfix'
-    q
-  endif
-endfunction
-augroup CloseIfOnlyControlWinLeft
-  au!
-  au BufEnter * call s:CloseIfOnlyControlWinLeft()
-augroup END
-
-" Highlight currently open buffer in NERDTree
-autocmd BufEnter * call SyncTree()
 
 set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
