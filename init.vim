@@ -2,6 +2,7 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
 Plug 'mattn/emmet-vim'
 Plug 'preservim/nerdtree'
@@ -24,13 +25,14 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Yggdroot/indentLine' 
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
-
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 " Initialize plugin system
 call plug#end()
 
 colorscheme github_dark
 
 " VSCode-like Configuration
+" -- ALT Up and Down (j and k) to swap lines
 nnoremap <A-Down> :m .+1<CR>==
 nnoremap <A-Up> :m .-2<CR>==
 inoremap <A-Down> <Esc>:m .+1<CR>==gi
@@ -44,11 +46,16 @@ inoremap <A-j> <Esc>:m .+1<CR>==gi
 inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
+" -- 
+"
+"
+"
+"
+"
+" End of VSCode-like Configuration 
 
 inoremap jk <ESC>
-nmap <C-n> :NERDTreeToggle<CR>
-vmap ++ <plug>NERDCommenterToggle
-nmap ++ <plug>NERDCommenterToggle
+
 
 set mouse=a
 set number
@@ -64,6 +71,10 @@ set history=5000
 set clipboard=unnamedplus
 
 " NERDTree Configuration
+nmap <C-n> :NERDTreeToggle<CR>
+vmap ++ <plug>NERDCommenterToggle
+nmap ++ <plug>NERDCommenterToggle
+
 let g:NERDTreeWinPos = "right"
 
 set autochdir
@@ -175,6 +186,9 @@ nnoremap <c-x> :bp \|bd #<cr>
 " -------------------------------------------------------------------------------------------------
 " coc.nvim default settings
 " -------------------------------------------------------------------------------------------------
+
+" Remap for rename current word
+nmap <F2> <Plug>(coc-rename)
 
 " if hidden is not set, TextEdit might fail.
 set hidden
