@@ -2,6 +2,8 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug 'lambdalisue/fern.vim'
+Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
@@ -31,6 +33,8 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 call plug#end()
 
 colorscheme github_dark
+
+let g:cursorhold_updatetime = 100
 
 " VSCode-like Configuration
 " -- ALT Up and Down (j and k) to swap lines
@@ -72,7 +76,8 @@ set history=5000
 set clipboard=unnamedplus
 
 " NERDTree Configuration
-nmap <C-n> :NERDTreeToggle<CR>
+autocmd VimEnter * cd %:p:h
+nmap <A-n> :NERDTreeToggle<CR>
 vmap ++ <plug>NERDCommenterToggle
 nmap ++ <plug>NERDCommenterToggle
 
