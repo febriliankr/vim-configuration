@@ -2,6 +2,7 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
 Plug 'mattn/emmet-vim'
@@ -47,9 +48,9 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gv
 " -- 
-"
-"
-"
+" this is not exactly vscode-like but I like to autosave
+let g:auto_save = 1  " enable AutoSave on Vim startup
+" I'm just checking if the autosave is working properly
 "
 "
 " End of VSCode-like Configuration 
