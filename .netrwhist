@@ -1,0 +1,6 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =4
+let g:netrw_dirhist_4='/Users/febrilian/Documents/notes/markdown-notes'
+let g:netrw_dirhist_3='/Users/febrilian/Documents/notes'
+let g:netrw_dirhist_2='/Users/febrilian/Documents/dev/cepat'
+let g:netrw_dirhist_1='/Users/febrilian/Documents/dev/go-kattis'
