@@ -2,7 +2,8 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
-Plug 'vimwiki/vimwiki'
+Plug 'skywind3000/asyncrun.vim'
+Plug 'samgriesemer/vim-roam'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'lambdalisue/fern.vim'
 Plug 'antoinemadec/FixCursorHold.nvim'
