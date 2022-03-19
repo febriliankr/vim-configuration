@@ -2,10 +2,13 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug 'preservim/nerdtree'
+Plug 'akinsho/toggleterm.nvim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'airblade/vim-rooter'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'samgriesemer/vim-roam'
-Plug 'lambdalisue/fern-git-status.vim'
-Plug 'lambdalisue/fern.vim'
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
@@ -15,7 +18,6 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
 Plug 'airblade/vim-gitgutter'
-Plug 'kien/ctrlp.vim' " fuzzy find files
 
 " Golang Setup
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -37,11 +39,15 @@ call plug#end()
 colorscheme github_dark
 
 let g:cursorhold_updatetime = 100
-
-" Fern Configuration
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * ++nested Fern -drawer %:h | if argc() > 0 || exists("s:std_in") | wincmd p | endif
-noremap <A-f> :Fern -drawer %:h -toggle<CR>
+" CoC Explorer Configuration
+nmap <space>e <Cmd>CocCommand explorer<CR>
+" Toggle Term
+nnoremap <silent> <C-T> :ToggleTerm size=8<CR>
+" Fzf Configuration
+nnoremap <silent> <C-p> :Files<CR>
+nnoremap <silent> <C-g> :GFiles<CR>
+nnoremap <silent> <C-o> :Buffers<CR>
+nnoremap <C-f> :Rg! 
 
 " VSCode-like Configuration
 " -- ALT Up and Down (j and k) to swap lines
@@ -78,8 +84,66 @@ set encoding=UTF-8
 set history=5000
 set clipboard=unnamedplus
 
+" NERDCommenter Configuration
 vmap ++ <plug>NERDCommenterToggle
 nmap ++ <plug>NERDCommenterToggle
+
+" NERDTree Configuration
+autocmd VimEnter * cd %:p:h
+nmap <A-n> :NERDTreeToggle<CR>
+let g:NERDTreeWinPos = "right"
+" open NERDTree automatically
+autocmd StdinReadPre * let s:std_in=1
+autocmd! VimEnter * NERDTree | wincmd w
+let g:NERDTreeGitStatusWithFlags = 1
+"let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+"let g:NERDTreeGitStatusNodeColorization = 1
+"let g:NERDTreeColorMapCustom = {
+    "\ "Staged"    : "#0ee375",  
+    "\ "Modified"  : "#d9bf91",  
+    "\ "Renamed"   : "#51C9FC",  
+    "\ "Untracked" : "#FCE77C",  
+    "\ "Unmerged"  : "#FC51E6",  
+    "\ "Dirty"     : "#FFBD61",  
+    "\ "Clean"     : "#87939A",   
+    "\ "Ignored"   : "#808080"   
+    "\ }                         
+
+let g:NERDTreeIgnore = ['^node_modules$']
+" sync open file with NERDTree
+" " Check if NERDTree is open or active
+function! IsNERDTreeOpen()        
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+
+" Call NERDTreeFind if NERDTree is active, current window contains a modifiable
+" file, and we're not in vimdiff
+function! SyncTree()
+  if &modifiable && IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
+    NERDTreeFind
+    wincmd p
+  endif
+endfunction
+
+" Close NERDTree if it is the only file
+function! s:CloseIfOnlyControlWinLeft()
+  if winnr("$") != 1
+    return
+  endif
+  if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
+        \ || &buftype == 'quickfix'
+    q
+  endif
+endfunction
+augroup CloseIfOnlyControlWinLeft
+  au!
+  au BufEnter * call s:CloseIfOnlyControlWinLeft()
+augroup END
+
+" Highlight currently open buffer in NERDTree
+autocmd BufEnter * call SyncTree()
+
+"END of NERDTree Configuration
 
 set autochdir
 "
@@ -90,9 +154,6 @@ set autochdir
 "let g:prettier#autoformat = 0
 "autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
-
-" ctrlp
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
 
 " j/k will move virtual lines (lines that wrap)
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
@@ -148,11 +209,11 @@ set signcolumn=yes
 
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+"inoremap <silent><expr> <TAB>
+      "\ pumvisible() ? "\<C-n>" :
+      "\ <SID>check_back_space() ? "\<TAB>" :
+      "\ coc#refresh()
+"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
