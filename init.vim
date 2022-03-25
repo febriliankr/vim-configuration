@@ -2,7 +2,7 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
-Plug 'preservim/nerdtree'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'akinsho/toggleterm.nvim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -14,17 +14,16 @@ Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
 Plug 'mattn/emmet-vim'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-Plug 'ryanoasis/vim-devicons'
 Plug 'airblade/vim-gitgutter'
 
 " Golang Setup
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
+
 Plug 'scrooloose/nerdcommenter'
-"Plug 'prettier/vim-prettier', { 'do': 'yarn install' }"
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install --frozen-lockfile --production',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'svelte', 'yaml', 'html'] }
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'sheerun/vim-polyglot'
 Plug 'rafi/awesome-vim-colorschemes'  
@@ -36,9 +35,40 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 " Initialize plugin system
 call plug#end()
 
+" NOTE: Configuration needs to be set BEFORE loading the color scheme with `colorscheme` command
+let g:github_function_style = "italic"
+let g:github_sidebars = ["qf", "vista_kind", "terminal", "packer"]
+
+" Change the "hint" color to the "orange" color, and make the "error" color bright red
+let g:github_colors = {
+  \ 'hint': 'orange',
+  \ 'error': '#ff0000'
+\ }
 colorscheme github_dark
 
+" highlight removal remapping (on press \)
+nnoremap \ :noh<return>
+
+
+" Netrw Configuration
+nnoremap <Leader>da :Lexplore<CR>
+nnoremap <leader>dd :Lexplore %:p:h<CR>
 let g:cursorhold_updatetime = 100
+" CoC Configuration
+let g:coc_borderchars = ['─', '│', '─', '│', '╭', '╮', '╯', '╰']
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
 nmap <space>e <Cmd>CocCommand explorer<CR>
 " Toggle Term
@@ -87,63 +117,6 @@ set clipboard=unnamedplus
 " NERDCommenter Configuration
 vmap ++ <plug>NERDCommenterToggle
 nmap ++ <plug>NERDCommenterToggle
-
-" NERDTree Configuration
-autocmd VimEnter * cd %:p:h
-nmap <A-n> :NERDTreeToggle<CR>
-let g:NERDTreeWinPos = "right"
-" open NERDTree automatically
-autocmd StdinReadPre * let s:std_in=1
-autocmd! VimEnter * NERDTree | wincmd w
-let g:NERDTreeGitStatusWithFlags = 1
-"let g:WebDevIconsUnicodeDecorateFolderNodes = 1
-"let g:NERDTreeGitStatusNodeColorization = 1
-"let g:NERDTreeColorMapCustom = {
-    "\ "Staged"    : "#0ee375",  
-    "\ "Modified"  : "#d9bf91",  
-    "\ "Renamed"   : "#51C9FC",  
-    "\ "Untracked" : "#FCE77C",  
-    "\ "Unmerged"  : "#FC51E6",  
-    "\ "Dirty"     : "#FFBD61",  
-    "\ "Clean"     : "#87939A",   
-    "\ "Ignored"   : "#808080"   
-    "\ }                         
-
-let g:NERDTreeIgnore = ['^node_modules$']
-" sync open file with NERDTree
-" " Check if NERDTree is open or active
-function! IsNERDTreeOpen()        
-  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
-endfunction
-
-" Call NERDTreeFind if NERDTree is active, current window contains a modifiable
-" file, and we're not in vimdiff
-function! SyncTree()
-  if &modifiable && IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
-    NERDTreeFind
-    wincmd p
-  endif
-endfunction
-
-" Close NERDTree if it is the only file
-function! s:CloseIfOnlyControlWinLeft()
-  if winnr("$") != 1
-    return
-  endif
-  if (exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1)
-        \ || &buftype == 'quickfix'
-    q
-  endif
-endfunction
-augroup CloseIfOnlyControlWinLeft
-  au!
-  au BufEnter * call s:CloseIfOnlyControlWinLeft()
-augroup END
-
-" Highlight currently open buffer in NERDTree
-autocmd BufEnter * call SyncTree()
-
-"END of NERDTree Configuration
 
 set autochdir
 "
@@ -228,6 +201,7 @@ nmap <silent> [c <Plug>(coc-diagnostic-prev)
 
 " disable vim-go :GoDef short cut (gd)
 " this is handled by LanguageClient [LC]
+let g:go_doc_popup_window = 1
 let g:go_def_mapping_enabled = 0
 nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
@@ -236,9 +210,6 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-
-" Use U to show documentation in preview window
-nnoremap <silent> U :call <SID>show_documentation()<CR>
 
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
