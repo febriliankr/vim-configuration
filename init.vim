@@ -2,8 +2,6 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'akinsho/toggleterm.nvim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-rooter'
@@ -51,6 +49,12 @@ nnoremap \ :noh<return>
 
 
 " Netrw Configuration
+let g:netrw_banner = 0        " remove directions at top of file listing
+let g:netrw_liststyle=3       " tree style listing
+let g:netrw_browse_split = 3  " split horizontal
+let g:netrw_altv = 1
+let g:netrw_winsize=25        " width of window
+let g:netrw_preview=1
 nnoremap <Leader>da :Lexplore<CR>
 nnoremap <leader>dd :Lexplore %:p:h<CR>
 let g:cursorhold_updatetime = 100
@@ -70,36 +74,14 @@ endfunction
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
-nmap <space>e <Cmd>CocCommand explorer<CR>
-" Toggle Term
-nnoremap <silent> <C-T> :ToggleTerm size=8<CR>
 " Fzf Configuration
+nmap <space>e <Cmd>CocCommand explorer<CR>
 nnoremap <silent> <C-p> :Files<CR>
 nnoremap <silent> <C-g> :GFiles<CR>
 nnoremap <silent> <C-o> :Buffers<CR>
 nnoremap <C-f> :Rg! 
 
-" VSCode-like Configuration
-" -- ALT Up and Down (j and k) to swap lines
-nnoremap <A-Down> :m .+1<CR>==
-nnoremap <A-Up> :m .-2<CR>==
-inoremap <A-Down> <Esc>:m .+1<CR>==gi
-inoremap <A-Up> <Esc>:m .-2<CR>==gi
-vnoremap <A-Down> :m '>+1<CR>gv=gv
-vnoremap <A-Up> :m '<-2<CR>gv=gv
-
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
-" -- 
-
-" End of VSCode-like Configuration 
-
 inoremap jk <ESC>
-
 
 set mouse=a
 set number
