@@ -13,7 +13,6 @@ Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
 Plug 'mattn/emmet-vim'
 Plug 'airblade/vim-gitgutter'
-
 " Golang Setup
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
