@@ -15,20 +15,16 @@ Plug 'mattn/emmet-vim'
 Plug 'airblade/vim-gitgutter'
 " Golang Setup
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-
-
 Plug 'scrooloose/nerdcommenter'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install --frozen-lockfile --production',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'svelte', 'yaml', 'html'] }
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'vue', 'svelte', 'yaml', 'html'] }
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'sheerun/vim-polyglot'
 Plug 'rafi/awesome-vim-colorschemes'  
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Yggdroot/indentLine' 
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
-Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 " Initialize plugin system
 call plug#end()
 
