@@ -15,5 +15,12 @@
                 }
             }
         }
-    }
+    },
+    "coc.preferences.formatOnSaveFiletypes": [
+        "css",
+        "markdown",
+        "tsx",
+        "ts",
+        "go"
+    ]
 }

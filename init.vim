@@ -11,37 +11,33 @@ Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 Plug 'projekt0n/github-nvim-theme'
+Plug 'arcticicestudio/nord-vim'
 Plug 'mattn/emmet-vim'
 Plug 'airblade/vim-gitgutter'
 " Golang Setup
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 Plug 'scrooloose/nerdcommenter'
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install --frozen-lockfile --production',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'vue', 'svelte', 'yaml', 'html'] }
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'rafi/awesome-vim-colorschemes'  
+
+"Plug 'prettier/vim-prettier', {
+  "\ 'do': 'yarn install --frozen-lockfile --production',
+  "\ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'vue', 'svelte', 'yaml', 'html'] }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
 Plug 'Yggdroot/indentLine' 
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 " Initialize plugin system
 call plug#end()
 
-" NOTE: Configuration needs to be set BEFORE loading the color scheme with `colorscheme` command
-let g:github_function_style = "italic"
-let g:github_sidebars = ["qf", "vista_kind", "terminal", "packer"]
-
-" Change the "hint" color to the "orange" color, and make the "error" color bright red
-let g:github_colors = {
-  \ 'hint': 'orange',
-  \ 'error': '#ff0000'
-\ }
 colorscheme github_dark
+
+" Prettier coc setup
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+" Prettier / press '\p' to run prettier command
+nnoremap <leader>p :Prettier<return>
 
 " highlight removal remapping (on press \)
 nnoremap \ :noh<return>
-
 
 " Netrw Configuration
 let g:netrw_banner = 0        " remove directions at top of file listing
@@ -96,11 +92,10 @@ vmap ++ <plug>NERDCommenterToggle
 nmap ++ <plug>NERDCommenterToggle
 
 set autochdir
-"
-" vim-prettier
+
 "let g:prettier#quickfix_enabled = 0
 "let g:prettier#quickfix_auto_focus = 0
-" run prettier on save
+ "run prettier on save
 "let g:prettier#autoformat = 0
 "autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
