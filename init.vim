@@ -1,28 +1,37 @@
 call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')  
-
+" init vim references for treesitter: https://github.com/elijahmanor/dotfiles/blob/master/nvim/.config/nvim/init.vim
 " Specify a directory for plugins
 call plug#begin('~/.vim/plugged')
+Plug 'leafOfTree/vim-svelte-plugin'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'preservim/nerdtree'
+" Snippet Plugins
+Plug 'SirVer/ultisnips'
+Plug 'mlaursen/vim-react-snippets'
+" Treesitter
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" Fzf for Search
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'yuki-yano/fzf-preview.vim', { 'branch': 'release/rpc' }
+
 Plug 'airblade/vim-rooter'
 Plug 'skywind3000/asyncrun.vim'
-Plug 'samgriesemer/vim-roam'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
+" Theme
 Plug 'projekt0n/github-nvim-theme'
-Plug 'arcticicestudio/nord-vim'
+
 Plug 'mattn/emmet-vim'
 Plug 'airblade/vim-gitgutter'
-" Golang Setup
 Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 Plug 'scrooloose/nerdcommenter'
-
-"Plug 'prettier/vim-prettier', {
-  "\ 'do': 'yarn install --frozen-lockfile --production',
-  "\ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'vue', 'svelte', 'yaml', 'html'] }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'arthurxavierx/vim-caser'
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
 Plug 'Yggdroot/indentLine' 
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
@@ -30,6 +39,9 @@ Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 call plug#end()
 
 colorscheme github_dark
+
+" coc-go settings for Go/Golang Development
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
 
 " Prettier coc setup
 command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
@@ -51,7 +63,7 @@ nnoremap <leader>dd :Lexplore %:p:h<CR>
 let g:cursorhold_updatetime = 100
 " CoC Configuration
 let g:coc_borderchars = ['─', '│', '─', '│', '╭', '╮', '╯', '╰']
-" Use K to show documentation in preview window
+" Use Shift + K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
@@ -65,15 +77,108 @@ endfunction
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
+
 " Fzf Configuration
-nmap <space>e <Cmd>CocCommand explorer<CR>
+"if has('nvim')
+  "aug fzf_setup
+    "au!
+    "au TermOpen term://*FZF tnoremap <silent> <buffer> <esc><esc> <c-c>
+  "aug END
+"end
+" Files + devicons + floating fzf
+function! FzfFilePreview()
+  let l:fzf_files_options = '--preview "bat --theme="OneHalfDark" --style=numbers,changes --color always {3..-1} | head -200" --expect=ctrl-v,ctrl-x'
+  let s:files_status = {}
+
+  function! s:cacheGitStatus()
+    let l:gitcmd = 'git -c color.status=false -C ' . $PWD . ' status -s'
+    let l:statusesStr = system(l:gitcmd)
+    let l:statusesSplit = split(l:statusesStr, '\n')
+    for l:statusLine in l:statusesSplit
+      let l:fileStatus = split(l:statusLine, ' ')[0]
+      let l:fileName = split(l:statusLine, ' ')[1]
+      let s:files_status[l:fileName] = l:fileStatus
+    endfor
+  endfunction
+
+  function! s:files()
+    call s:cacheGitStatus()
+    let l:files = split(system($FZF_DEFAULT_COMMAND), '\n')
+    return s:prepend_indicators(l:files)
+  endfunction
+
+  function! s:prepend_indicators(candidates)
+    return s:prepend_git_status(s:prepend_icon(a:candidates))
+  endfunction
+
+  function! s:prepend_git_status(candidates)
+    let l:result = []
+    for l:candidate in a:candidates
+      let l:status = ''
+      let l:icon = split(l:candidate, ' ')[0]
+      let l:filePathWithIcon = split(l:candidate, ' ')[1]
+
+      let l:pos = strridx(l:filePathWithIcon, ' ')
+      let l:file_path = l:filePathWithIcon[pos+1:-1]
+      if has_key(s:files_status, l:file_path)
+        let l:status = s:files_status[l:file_path]
+        call add(l:result, printf('%s %s %s', l:status, l:icon, l:file_path))
+      else
+        " printf statement contains a load-bearing unicode space
+        " the file path is extracted from the list item using {3..-1},
+        " this breaks if there is a different number of spaces, which
+        " means if we add a space in the following printf it breaks.
+        " using a unicode space preserves the spacing in the fzf list
+        " without breaking the {3..-1} index
+        call add(l:result, printf('%s %s %s', ' ', l:icon, l:file_path))
+      endif
+    endfor
+
+    return l:result
+  endfunction
+
+  function! s:prepend_icon(candidates)
+    let l:result = []
+    for l:candidate in a:candidates
+      let l:filename = fnamemodify(l:candidate, ':p:t')
+      let l:icon = WebDevIconsGetFileTypeSymbol(l:filename, isdirectory(l:filename))
+      call add(l:result, printf('%s %s', l:icon, l:candidate))
+    endfor
+
+    return l:result
+  endfunction
+
+  function! s:edit_file(lines)
+    if len(a:lines) < 2 | return | endif
+
+    let l:cmd = get({'ctrl-x': 'split',
+                 \ 'ctrl-v': 'vertical split',
+                 \ 'ctrl-t': 'tabe'}, a:lines[0], 'e')
+
+    for l:item in a:lines[1:]
+      let l:pos = strridx(l:item, ' ')
+      let l:file_path = l:item[pos+1:-1]
+      execute 'silent '. l:cmd . ' ' . l:file_path
+    endfor
+  endfunction
+
+  call fzf#run({
+        \ 'source': <sid>files(),
+        \ 'sink*':   function('s:edit_file'),
+        \ 'options': '-m --preview-window=right:70%:noborder --prompt Files\> ' . l:fzf_files_options,
+        \ 'down':    '40%',
+        \ 'window': 'call FloatingFZF()'})
+
+endfunction
 nnoremap <silent> <C-p> :Files<CR>
 nnoremap <silent> <C-g> :GFiles<CR>
 nnoremap <silent> <C-o> :Buffers<CR>
-nnoremap <C-f> :Rg! 
+nnoremap <C-f> :Rg 
 
-inoremap jk <ESC>
-
+" Set No background, so I can use iTerm2 Background Image
+hi Normal guibg=NONE ctermbg=NONE
+hi airline_tabfill ctermbg=NONE guibg=NONE
+hi airline_c  ctermbg=NONE guibg=NONE
 set mouse=a
 set number
 set hidden
@@ -93,6 +198,7 @@ nmap ++ <plug>NERDCommenterToggle
 
 set autochdir
 
+
 "let g:prettier#quickfix_enabled = 0
 "let g:prettier#quickfix_auto_focus = 0
  "run prettier on save
@@ -106,32 +212,40 @@ noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <C-s> :w<CR>
 nnoremap <C-Q> :wq<CR>
 
-" shift+arrow selection
-nmap <S-Up> v<Up>
-nmap <S-Down> v<Down>
-nmap <S-Left> v<Left>
-nmap <S-Right> v<Right>
-vmap <S-Up> <Up>
-vmap <S-Down> <Down>
-vmap <S-Left> <Left>
-vmap <S-Right> <Right>
-imap <S-Up> <Esc>v<Up>
-imap <S-Down> <Esc>v<Down>
-imap <S-Left> <Esc>v<Left>
-imap <S-Right> <Esc>v<Right>
-
 set cindent
+
+" Treesitter
+" nvim-treesitter {{{
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { 'go', 'html', 'javascript', 'typescript', 'tsx', 'css', 'json' },
+  -- ensure_installed = "all", -- or maintained
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = true
+  },
+  indent = {
+    enable = false
+  },
+  context_commentstring = {
+    enable = true
+  }
+}
+EOF
+" }}}
+" Journaling
+iabbrev onething What's the one thing that I can do today, such by doing that, everything else will become easier?
 
 set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_statusline_ontop=0
-let g:airline_theme='base16_tomorrow'
+let g:airline_theme='transparent'
 
 let g:airline#extensions#tabline#formatter = 'default'
-" navegação entre os buffers
-nnoremap <M-Right> :bn<cr>
-nnoremap <M-Left> :bp<cr>
+" Remap moving between buffers
+"nnoremap <M-Up> :bn<cr>
+"nnoremap <M-Down> :bp<cr>
 nnoremap <c-x> :bp \|bd #<cr>
 
 " -------------------------------------------------------------------------------------------------
@@ -151,6 +265,8 @@ set updatetime=300
 set shortmess+=c
 " always show signcolumns
 set signcolumn=yes
+" Set relative number
+set relativenumber
 
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -179,13 +295,20 @@ nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
+"nmap <silent> gy <Plug>(coc-type-definition)
+"nmap <silent> gi <Plug>(coc-implementation)
+"nmap <silent> gr <Plug>(coc-references)
 
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-
+" Golang Coc 
+cabbrev t tabnew
+cabbrev coc CocCommand
+cabbrev ccgt CocCommand go.tags.add json
+cabbrev ccgic CocCommand go.impl.cursor
+cabbrev ccgtt CocCommand go.test.toggle
+autocmd FileType go nmap gic :CocCommand go.impl.cursor <cr>
+autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
+autocmd FileType go nmap gtd :CocCommand go.tags.add db<cr>
+autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
 " Remap for format selected region
 vmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
@@ -206,6 +329,5 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" disable vim-go :GoDef short cut (gd)
 " this is handled by LanguageClient [LC]
 let g:go_def_mapping_enabled = 0
