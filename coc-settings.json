@@ -55,5 +55,7 @@
     "constructor": "  ",
     "value": "  ",
     "enumMember": "  "
-  }
+  },
+  "explorer.icon.source": "nvim-web-devicons",
+  "explorer.icon.enableNerdfont": true
 }

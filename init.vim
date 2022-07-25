@@ -60,7 +60,7 @@ let g:netrw_winsize=25        " width of window
 let g:netrw_preview=1
 nnoremap <Leader>da :Lexplore<CR>
 nnoremap <leader>dd :Lexplore %:p:h<CR>
-let g:cursorhold_updatetime = 100
+let g:cursorhold_updatetime = 80
 " CoC Configuration
 let g:coc_borderchars = ['─', '│', '─', '│', '╭', '╮', '╯', '╰']
 " Use Shift + K to show documentation in preview window
@@ -77,6 +77,7 @@ endfunction
 " Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
+:nmap <space>e <Cmd>CocCommand explorer<CR>
 
 " Fzf Configuration
 "if has('nvim')
@@ -218,7 +219,7 @@ set cindent
 " nvim-treesitter {{{
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { 'go', 'html', 'javascript', 'typescript', 'tsx', 'css', 'json' },
+  ensure_installed = { 'go', 'html', 'javascript', 'typescript', 'tsx', 'css', 'json', 'svelte' },
   -- ensure_installed = "all", -- or maintained
   highlight = {
     enable = true,
@@ -243,6 +244,7 @@ let g:airline_statusline_ontop=0
 let g:airline_theme='transparent'
 
 let g:airline#extensions#tabline#formatter = 'default'
+
 " Remap moving between buffers
 "nnoremap <M-Up> :bn<cr>
 "nnoremap <M-Down> :bp<cr>
@@ -315,7 +317,7 @@ nmap <leader>f  <Plug>(coc-format-selected)
 " Show all diagnostics
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+"nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
 " Show commands
 nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
 " Find symbol of current document
