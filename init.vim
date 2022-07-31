@@ -23,8 +23,7 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
-" Theme
-Plug 'projekt0n/github-nvim-theme'
+
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
 Plug 'mattn/emmet-vim'
@@ -39,7 +38,6 @@ Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 call plug#end()
 
 colorscheme tokyonight
-"colorscheme github_dark
 
 " Barbar
 " Move to previous/next
@@ -115,30 +113,6 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
 :nmap <space>e <Cmd>CocCommand explorer<CR>
-" have vim start coc-explorer if vim started with folder
-augroup MyCocExplorer
-  autocmd!
-  autocmd VimEnter * sil! au! F
-  " set window status line
-  autocmd FileType coc-explorer setl statusline=File-Explorer
-  "quit explorer whein it's the last
-  autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
-  " Make sure nothing opened in coc-explorer buffer
-  autocmd BufEnter * if bufname('#') =~# "\[coc-explorer\]-." && winnr('$') > 1 | b# | endif
-  " open if directory specified or if buffer empty
-  autocmd VimEnter * let d = expand('%:p')
-    \ | if argc() == 0
-      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+'
-    \ | elseif isdirectory(d) || (bufname()=='')
-      \ | silent! bd
-      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+ ' . d
-      \ | exe 'cd ' . d
-    \ | else
-      \ | cd %:p:h
-    \ | endif
-  " cd after open
-  autocmd User CocExplorerOpenPost let dir = getcwd() | call CocActionAsync("runCommand", "explorer.doAction", "closest", {"name": "cd", "args": [dir]})
-augroup END
 
 " Fzf Configuration
 "if has('nvim')
