@@ -4,12 +4,13 @@ call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')
 call plug#begin('~/.vim/plugged')
 Plug 'leafOfTree/vim-svelte-plugin'
 Plug 'kyazdani42/nvim-web-devicons'
-Plug 'preservim/nerdtree'
+Plug 'romgrk/barbar.nvim'
 " Snippet Plugins
 Plug 'SirVer/ultisnips'
 Plug 'mlaursen/vim-react-snippets'
 " Treesitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'easymotion/vim-easymotion'
 
 " Fzf for Search
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -24,6 +25,7 @@ Plug '907th/vim-auto-save'
 Plug 'github/copilot.vim'
 " Theme
 Plug 'projekt0n/github-nvim-theme'
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
 Plug 'mattn/emmet-vim'
 Plug 'airblade/vim-gitgutter'
@@ -32,13 +34,48 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'arthurxavierx/vim-caser'
-Plug 'sonph/onehalf', {'rtp': 'vim/'}
-Plug 'Yggdroot/indentLine' 
 Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 " Initialize plugin system
 call plug#end()
 
-colorscheme github_dark
+colorscheme tokyonight
+"colorscheme github_dark
+
+" Barbar
+" Move to previous/next
+nnoremap <silent>    <A-,> :BufferPrevious<CR>
+nnoremap <silent>    <A-.> :BufferNext<CR>
+" Re-order to previous/next
+nnoremap <silent>    <A-<> :BufferMovePrevious<CR>
+nnoremap <silent>    <A->> :BufferMoveNext<CR>
+" Goto buffer in position...
+nnoremap <silent>    <A-1> :BufferGoto 1<CR>
+nnoremap <silent>    <A-2> :BufferGoto 2<CR>
+nnoremap <silent>    <A-3> :BufferGoto 3<CR>
+nnoremap <silent>    <A-4> :BufferGoto 4<CR>
+nnoremap <silent>    <A-5> :BufferGoto 5<CR>
+nnoremap <silent>    <A-6> :BufferGoto 6<CR>
+nnoremap <silent>    <A-7> :BufferGoto 7<CR>
+nnoremap <silent>    <A-8> :BufferGoto 8<CR>
+nnoremap <silent>    <A-9> :BufferLast<CR>
+" Pin/unpin buffer
+nnoremap <silent>    <A-p> :BufferPin<CR>
+" Close buffer
+nnoremap <silent>    <A-c> :BufferClose<CR>
+
+" Vim Easymotion Configuration
+
+map <Leader> <Plug>(easymotion-prefix)
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+
+" Move to line
+map <Leader>L <Plug>(easymotion-bd-jk)
+nmap <Leader>L <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 " coc-go settings for Go/Golang Development
 autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
@@ -78,6 +115,30 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " CoC Explorer Configuration
 :nmap <space>e <Cmd>CocCommand explorer<CR>
+" have vim start coc-explorer if vim started with folder
+augroup MyCocExplorer
+  autocmd!
+  autocmd VimEnter * sil! au! F
+  " set window status line
+  autocmd FileType coc-explorer setl statusline=File-Explorer
+  "quit explorer whein it's the last
+  autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
+  " Make sure nothing opened in coc-explorer buffer
+  autocmd BufEnter * if bufname('#') =~# "\[coc-explorer\]-." && winnr('$') > 1 | b# | endif
+  " open if directory specified or if buffer empty
+  autocmd VimEnter * let d = expand('%:p')
+    \ | if argc() == 0
+      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+'
+    \ | elseif isdirectory(d) || (bufname()=='')
+      \ | silent! bd
+      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+ ' . d
+      \ | exe 'cd ' . d
+    \ | else
+      \ | cd %:p:h
+    \ | endif
+  " cd after open
+  autocmd User CocExplorerOpenPost let dir = getcwd() | call CocActionAsync("runCommand", "explorer.doAction", "closest", {"name": "cd", "args": [dir]})
+augroup END
 
 " Fzf Configuration
 "if has('nvim')
