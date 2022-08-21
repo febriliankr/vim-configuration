@@ -1,3 +1,8 @@
+" Plugin yang sebenernya gak terlalu penting
+" vim-easymotion
+" easymotion
+
+
 call plug#begin('~/.local/share/nvim/site/autoload/plug.vim')  
 " init vim references for treesitter: https://github.com/elijahmanor/dotfiles/blob/master/nvim/.config/nvim/init.vim
 " Specify a directory for plugins
@@ -116,8 +121,10 @@ let g:netrw_preview=1
 nnoremap <Leader>da :Lexplore<CR>
 nnoremap <leader>dd :Lexplore %:p:h<CR>
 let g:cursorhold_updatetime = 80
-" CoC Configuration
+" CoC 
 let g:coc_borderchars = ['─', '│', '─', '│', '╭', '╮', '╯', '╰']
+" CoC / Commands
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
 " Use Shift + K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
@@ -378,18 +385,6 @@ nmap <leader>f  <Plug>(coc-format-selected)
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
 "nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-" Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " this is handled by LanguageClient [LC]
 let g:go_def_mapping_enabled = 0
