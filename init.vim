@@ -10,8 +10,10 @@ Plug 'SirVer/ultisnips'
 Plug 'mlaursen/vim-react-snippets'
 " Treesitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'AndrewRadev/tagalong.vim'
 Plug 'easymotion/vim-easymotion'
 
+Plug 'folke/trouble.nvim'
 " Fzf for Search
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -37,7 +39,26 @@ Plug 'HerringtonDarkholme/yats.vim' " TS Syntax
 " Initialize plugin system
 call plug#end()
 
+let g:tokyonight_italic_functions = 1
+let g:tokyonight_sidebars = [ "qf", "vista_kind", "terminal", "packer" ]
+
+" Change the "hint" color to the "orange" color, and make the "error" color bright red
+let g:tokyonight_colors = {
+  \ 'hint': 'orange',
+  \ 'error': '#ff0000'
+\ }
+
+" Load the colorscheme
 colorscheme tokyonight
+
+" Trouble
+" Vim Script
+nnoremap <leader>xx <cmd>TroubleToggle<cr>
+nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
+nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
+nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
+nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
+noremap gR <cmd>TroubleToggle lsp_references<cr>
 
 " Barbar
 " Move to previous/next
@@ -59,10 +80,9 @@ nnoremap <silent>    <A-9> :BufferLast<CR>
 " Pin/unpin buffer
 nnoremap <silent>    <A-p> :BufferPin<CR>
 " Close buffer
-nnoremap <silent>    <A-c> :BufferClose<CR>
+nnoremap <silent>    <A-w> :BufferClose<CR>
 
 " Vim Easymotion Configuration
-
 map <Leader> <Plug>(easymotion-prefix)
 map  <Leader>f <Plug>(easymotion-bd-f)
 nmap <Leader>f <Plug>(easymotion-overwin-f)
@@ -213,6 +233,7 @@ nnoremap <C-f> :Rg
 
 " Set No background, so I can use iTerm2 Background Image
 hi Normal guibg=NONE ctermbg=NONE
+set wildignore+=*/node_modules/**
 hi airline_tabfill ctermbg=NONE guibg=NONE
 hi airline_c  ctermbg=NONE guibg=NONE
 set mouse=a
@@ -234,14 +255,6 @@ nmap ++ <plug>NERDCommenterToggle
 
 set autochdir
 
-
-"let g:prettier#quickfix_enabled = 0
-"let g:prettier#quickfix_auto_focus = 0
- "run prettier on save
-"let g:prettier#autoformat = 0
-"autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
-
-
 " j/k will move virtual lines (lines that wrap)
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
@@ -254,7 +267,7 @@ set cindent
 " nvim-treesitter {{{
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { 'go', 'html', 'javascript', 'typescript', 'tsx', 'css', 'json', 'svelte' },
+  ensure_installed = { 'go', 'dart', 'html', 'javascript', 'typescript', 'tsx', 'css', 'json', 'svelte' },
   -- ensure_installed = "all", -- or maintained
   highlight = {
     enable = true,
@@ -271,6 +284,7 @@ EOF
 " }}}
 " Journaling
 iabbrev onething What's the one thing that I can do today, such by doing that, everything else will become easier?
+cabbrev date r!jdate
 
 set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
@@ -335,6 +349,17 @@ nmap <silent> gd <Plug>(coc-definition)
 "nmap <silent> gy <Plug>(coc-type-definition)
 "nmap <silent> gi <Plug>(coc-implementation)
 "nmap <silent> gr <Plug>(coc-references)
+
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
 
 " Golang Coc 
 cabbrev t tabnew

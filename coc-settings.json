@@ -19,6 +19,7 @@
     }
   },
   "coc.preferences.formatOnSaveFiletypes": [
+    "html",
     "css",
     "markdown",
     "tsx",
@@ -60,5 +61,4 @@
   "explorer.icon.enableNerdfont": true,
   "explorer.file.showHiddenFiles": true,
   "explorer.width": 30
-
 }
