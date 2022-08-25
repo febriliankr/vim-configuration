@@ -29,8 +29,6 @@ Plug 'skywind3000/asyncrun.vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'antoinemadec/FixCursorHold.nvim'
 Plug '907th/vim-auto-save'
-Plug 'github/copilot.vim'
-
 Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 
 Plug 'mattn/emmet-vim'
@@ -353,8 +351,8 @@ nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
-"nmap <silent> gy <Plug>(coc-type-definition)
-"nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
 "nmap <silent> gr <Plug>(coc-references)
 
 " use <tab> for trigger completion and navigate to the next complete item
@@ -370,7 +368,6 @@ inoremap <silent><expr> <Tab>
 
 " Golang Coc 
 cabbrev t tabnew
-cabbrev coc CocCommand
 cabbrev ccgt CocCommand go.tags.add json
 cabbrev ccgic CocCommand go.impl.cursor
 cabbrev ccgtt CocCommand go.test.toggle
